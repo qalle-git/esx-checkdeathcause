@@ -69,7 +69,7 @@ local Keys = {
 				  end
   
 			  else
-				  sleep = sleep / 10 + distance 
+				  sleep = sleep / 100 * distance 
 			  end
   
 		  end
