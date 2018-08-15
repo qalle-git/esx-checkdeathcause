@@ -15,7 +15,7 @@ local Keys = {
   Citizen.CreateThread(function()
 	  while ESX == nil do
 		  TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		  Citizen.Wait(0)
+		  Citizen.Wait(1)
 	  end
 		PlayerData = ESX.GetPlayerData()
   end)
@@ -30,32 +30,60 @@ local Keys = {
 	PlayerData.job = job
   end)
   
-  local checking = false
+  local Melee = { -1569615261, 1737195953, 1317494643, -1786099057, 1141786504, -2067956739, -868994466 }
+  local Knife = { -1716189206, 1223143800, -1955384325, -1833087301, 910830060, }
+  local Bullet = { 453432689, 1593441988, 584646201, -1716589765, 324215364, 736523883, -270015777, -1074790547, -2084633992, -1357824103, -1660422300, 2144741730, 487013001, 2017895192, -494615257, -1654528753, 100416529, 205991906, 1119849093 }
+  local Animal = { -100946242, 148160082 }
+  local FallDamage = { -842959696 }
+  local Explosion = { -1568386805, 1305664598, -1312131151, 375527679, 324506233, 1752584910, -1813897027, 741814745, -37975472, 539292904, 341774354, -1090665087 }
+  local Gas = { -1600701090 }
+  local Burn = { 615608432, 883325847, -544306709 }
+  local Drown = { -10959621, 1936677264 }
+  local Car = { 133987706, -1553120962 }
+  
+  function checkArray (array, val)
+	  for name, value in ipairs(array) do
+		  if value == val then
+			  return true
+		  end
+	  end
+  
+	  return false
+  end
   
   Citizen.CreateThread(function()
+	  Citizen.Wait(1000)
 		while true do
-		  Citizen.Wait(3000)
+		  local sleep = 3000
   
-		  if not checking then
+		  if not IsPedInAnyVehicle(GetPlayerPed(-1)) then
   
 			  local player, distance = ESX.Game.GetClosestPlayer()
   
-			  if not IsPedInAnyVehicle(GetPlayerPed(-1)) then
+			  if distance ~= -1 and distance < 10.0 then
+  
 				  if distance ~= -1 and distance <= 2.0 then	
 					  if IsPedDeadOrDying(GetPlayerPed(player)) then
 						  Start(GetPlayerPed(player))
 					  end
 				  end
+  
+			  else
+				  sleep = sleep + distance
 			  end
+  
 		  end
+  
+		  Citizen.Wait(sleep)
   
 	  end
   end)
   
   function Start(ped)
 	  checking = true
+  
 	  while checking do
-		  Citizen.Wait(3)
+		  Citizen.Wait(5)
   
 		  local distance = GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)), GetEntityCoords(ped))
   
@@ -63,7 +91,7 @@ local Keys = {
   
 		  if distance < 2.0 then
 			  DrawText3D(x,y,z, 'Tryck [~g~E~s~] för att hantera person', 0.4)
-			  --DrawText3D(GetEntityCoords(GetPlayerPed(player))["x"], GetEntityCoords(GetPlayerPed(player))["y"], GetEntityCoords(GetPlayerPed(player))["z"], "Tryck [~g~E~w~] för att kolla på persones skador.", 0.4)
+			  
 			  if IsControlPressed(0,  Keys['E']) then
 				  OpenDeathMenu(ped)
 			  end
@@ -75,7 +103,6 @@ local Keys = {
   
 	  end
   
-	  checking = false
   end
   
   function Notification(x,y,z, message)
@@ -89,23 +116,25 @@ local Keys = {
   end
   
   function OpenDeathMenu(player)
-			local elements   = {}
-	
-			table.insert(elements, {label = 'Kolla Dödsorsak', value = 'deathcause'})
-			table.insert(elements, {label = 'Kolla Vart personen är skadad', value = 'damage'})
+  
+	  loadAnimDict('amb@medic@standing@kneel@base')
+	  loadAnimDict('anim@gangops@facility@servers@bodysearch@')
+  
+	  local elements   = {}
+  
+	  table.insert(elements, {label = 'Försök identifiera dödsorsak', value = 'deathcause'})
+	  table.insert(elements, {label = 'Försök identifiera vart skadan är inträffad', value = 'damage'})
   
   
-	ESX.UI.Menu.Open(
-	  'default', GetCurrentResourceName(), 'dead_citizen',
-	  {
-		title    = 'Person-handlingar',
-		align    = 'top-right',
-		elements = elements,
-	  },
+	  ESX.UI.Menu.Open(
+		  'default', GetCurrentResourceName(), 'dead_citizen',
+		  {
+			  title    = 'Väl Åtgärd',
+			  align    = 'top-right',
+			  elements = elements,
+		  },
 	  function(data, menu)
 		  local ac = data.current.value
-  
-		  --local player, distance = ESX.Game.GetClosestPlayer()
   
 		  if ac == 'damage' then
   
@@ -114,13 +143,13 @@ local Keys = {
   
 			  local success,bone = GetPedLastDamageBone(player)
 			  if success then
-				  print(bone)
+				  --print(bone)
 				  local x,y,z = table.unpack(GetPedBoneCoords(player, bone))
   
 					if bone == 24817 then
 						Notification(x, y, z, 'Personen är skadad i bröstet')
 					elseif bone == 24816 then
-				  Notification(x, y, z, 'Personen är skadad i bröstet')
+					  Notification(x, y, z, 'Personen är skadad i bröstet')
 					elseif bone == 31086 then
 						Notification(x,y,z,'Personen är skadad i huvudet')
 					elseif bone == 58271 then
@@ -137,56 +166,49 @@ local Keys = {
 						Notification(x,y,z,'Personen är skadad i höger-handen')
 					end
 			  else
-				-- couldn't get the bone, uh oh
+				  Notify('Någon speciell plats kunde ej identifieras')
 			  end
 		  end
   
-		  if ac == 'deathcause' and distance ~= -1 and distance <= 2.0 then
+		  if ac == 'deathcause' then
 			  --gets deathcause
 			  local d = GetPedCauseOfDeath(player)		
 			  local playerPed = GetPlayerPed(-1)
   
 			  --starts animation
   
-			  TaskStartScenarioInPlace(playerPed, Config.Animation, 0, true)
+			  TaskPlayAnim(GetPlayerPed(-1), "amb@medic@standing@kneel@base" ,"base" ,8.0, -8.0, -1, 1, 0, false, false, false )
+			  TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false )
   
-			  Citizen.Wait(Config.TimeDoingAnimation)
+			  Citizen.Wait(5000)
   
 			  --exits animation			
   
 			  ClearPedTasksImmediately(playerPed)
   
-				  if d == -1569615261 or d == 1737195953 or d == 1317494643 or d == -1786099057 or d == 1141786504 or d == -2067956739 or d == -868994466 or d == -1951375401 then
-					  sendNotification(_U('hardmeele'), 'warning', 2500)
-				  elseif d == 453432689 or d == 1593441988 or d == 584646201 or d == -1716589765 or d == 324215364 or d == 736523883 or d == -270015777 or d == -1074790547 or d == -2084633992 or d == -1357824103 or d == -1660422300 or d == 2144741730 or d == 487013001 or d == 2017895192 or d == -494615257 or d == -1654528753 or d == 100416529 or d == 205991906 or d == 1119849093 or d == -1045183535 then
-					  sendNotification(_U('bullet'), 'warning', 2500)
-				  elseif d == -1716189206 or d == 1223143800 or d == -1955384325 or d == -1833087301 or d == 910830060 then
-					  sendNotification(_U('knifes'), 'warning', 2500)
-				  elseif d == -100946242 or d == 148160082 then
-					  sendNotification(_U('bitten'), 'warning', 2500)
-				  elseif d == -842959696 then
-					  sendNotification(_U('brokenlegs'), 'warning', 2500)
-				  elseif d == -1568386805 or d == 1305664598 or d == -1312131151 or d == 375527679 or d == 324506233 or d == 1752584910 or d == -1813897027 or d == 741814745 or d == -37975472 or d == 539292904 or d == 341774354 or d == -1090665087 then
-					  sendNotification(_U('explosive'), 'warning', 2500)
-				  elseif d == -1600701090 then
-					  sendNotification(_U('gas'), 'warning', 2500)
-				  elseif d == 101631238 then
-					  sendNotification(_U('fireextinguisher'), 'warning', 2500)
-				  elseif d == 615608432 or d == 883325847 or d == -544306709 then
-					  sendNotification(_U('fire'), 'warning', 2500)
-				  elseif d == -10959621 or d == 1936677264 then
-					  sendNotification(_U('drown'), 'warning', 2500)
-				  elseif d == 133987706 or d == -1553120962 then
-					  sendNotification(_U('caraccident'), 'warning', 2500)
-				  else
-					  sendNotification(_U('unknown'), 'error', 2500)
-				  end
+			  if checkArray(Melee, d) then
+				  Notify(_U('hardmeele'))
+			  elseif checkArray(Bullet, d) then
+				  Notify(_U('bullet'))
+			  elseif checkArray(Knife, d) then
+				  Notify(_U('knifes'))
+			  elseif checkArray(Animal, d) then
+				  Notify(_U('bitten'))
+			  elseif checkArray(FallDamage, d) then
+				  Notify(_U('brokenlegs'))
+			  elseif checkArray(Explosion, d) then
+				  Notify(_U('explosive'))
+			  elseif checkArray(Gas, d) then
+				  Notify(_U('gas'))
+			  elseif checkArray(Burn, d) then
+				  Notify(_U('fire'))
+			  elseif checkArray(Drown, d) then
+				  Notify(_U('drown'))
+			  elseif checkArray(Car, d) then
+				  Notify(_U('caraccident'))
+			  else
+				  Notify(_U('unknown'))
 			  end
-  
-		  if ac == 'dna' and distance ~= -1 and distance <= 2.0 then
-			  --hämtar en bag med identifiern som ligger död
-			  TriggerServerEvent('esx_qalle_dna:getBag', GetPlayerServerId(player), GetPlayerServerId(PlayerId()))
-			  sendNotification('Du tog ett dna-prov och la ner det i fickan', 'success', 5000)
 		  end
   
   
@@ -197,25 +219,16 @@ local Keys = {
 	)
   end
   
-  function hintToDisplay(text)
-	  SetTextComponentFormat("STRING")
-	  AddTextComponentString(text)
-	  DisplayHelpTextFromStringLabel(0, 0, 1, -1)
+  function loadAnimDict(dict)
+	  while (not HasAnimDictLoaded(dict)) do
+		  RequestAnimDict(dict)
+		  
+		  Citizen.Wait(1)
+	  end
   end
   
-  
-  function LocalPed()
-	  return GetPlayerPed(-1)
-  end
-  
-  function sendNotification(message, messageType, messageTimeout)
-	  TriggerEvent("pNotify:SendNotification", {
-		  text = message,
-		  type = messageType,
-		  queue = "qalle",
-		  timeout = messageTimeout,
-		  layout = "bottomCenter"
-	  })
+  function Notify(message)
+	  ESX.ShowNotification(message)
   end
   
   function DrawText3D(x, y, z, text, scale)

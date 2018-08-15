@@ -1,4 +1,4 @@
-# esx_damage
+# esx-checkdeathcause
 
 [REQUIREMENTS]
   
@@ -12,6 +12,6 @@
 1) CD in your resources/[esx] folder
 
 2) Add this in your server.cfg :
-``start esx_damage``
+``start esx-checkdeathcause``
 
 lua
