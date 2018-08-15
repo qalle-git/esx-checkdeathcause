@@ -69,7 +69,7 @@ local Keys = {
 				  end
   
 			  else
-				  sleep = sleep + distance
+				  sleep = sleep / 10 + distance 
 			  end
   
 		  end
@@ -90,7 +90,7 @@ local Keys = {
 		  local x,y,z = table.unpack(GetEntityCoords(ped))
   
 		  if distance < 2.0 then
-			  DrawText3D(x,y,z, 'Tryck [~g~E~s~] för att hantera person', 0.4)
+			  DrawText3D(x,y,z, 'Press [~g~E~s~] to manage individual', 0.4)
 			  
 			  if IsControlPressed(0,  Keys['E']) then
 				  OpenDeathMenu(ped)
@@ -101,9 +101,9 @@ local Keys = {
 			  checking = false
 		  end
   
-	  end
+	end
   
-  end
+end
   
   function Notification(x,y,z, message)
 	  local timestamp = GetGameTimer()
@@ -145,28 +145,10 @@ local Keys = {
 			  if success then
 				  --print(bone)
 				  local x,y,z = table.unpack(GetPedBoneCoords(player, bone))
-  
-					if bone == 24817 then
-						Notification(x, y, z, 'Personen är skadad i bröstet')
-					elseif bone == 24816 then
-					  Notification(x, y, z, 'Personen är skadad i bröstet')
-					elseif bone == 31086 then
-						Notification(x,y,z,'Personen är skadad i huvudet')
-					elseif bone == 58271 then
-						Notification(x,y,z,'Personen är skadad i vänster-benet')
-					elseif bone == 51826 then
-						Notification(x,y,z,'Personen är skadad i höger-benet')
-					elseif bone == 14201 then
-						Notification(x,y,z,'Personen är skadad i vänster-foten')
-					elseif bone == 52301 then
-						Notification(x,y,z,'Personen är skadad i höger-foten')
-					elseif bone == 18905 then
-						Notification(x,y,z,'Personen är skadad i vänster-handen')
-					elseif bone == 57005 then
-						Notification(x,y,z,'Personen är skadad i höger-handen')
-					end
+					Notification(x,y,z 'The damage occured here')
+				
 			  else
-				  Notify('Någon speciell plats kunde ej identifieras')
+				  Notify('Where the damage occured could not get identified')
 			  end
 		  end
   
