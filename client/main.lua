@@ -15,7 +15,7 @@ local Keys = {
   Citizen.CreateThread(function()
 	  while ESX == nil do
 		  TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		  Citizen.Wait(0)
+		  Citizen.Wait(1)
 	  end
 		PlayerData = ESX.GetPlayerData()
   end)
