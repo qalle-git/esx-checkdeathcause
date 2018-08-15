@@ -105,12 +105,12 @@ local Keys = {
   
 end
   
-  function Notification(x,y,z, message)
+  function Notification(x,y,z)
 	  local timestamp = GetGameTimer()
   
 	  while (timestamp + 4500) > GetGameTimer() do
 		  Citizen.Wait(0)
-		  DrawText3D(x, y, z, 'Personen verkar skadad här', 0.4)
+		  DrawText3D(x, y, z, 'The damage seems to occure here', 0.4)
 		  checking = false
 	  end
   end
@@ -122,14 +122,14 @@ end
   
 	  local elements   = {}
   
-	  table.insert(elements, {label = 'Försök identifiera dödsorsak', value = 'deathcause'})
-	  table.insert(elements, {label = 'Försök identifiera vart skadan är inträffad', value = 'damage'})
+	  table.insert(elements, {label = 'Try to identify deathcause', value = 'deathcause'})
+	  table.insert(elements, {label = 'Try to identify where the damage occured', value = 'damage'})
   
   
 	  ESX.UI.Menu.Open(
 		  'default', GetCurrentResourceName(), 'dead_citizen',
 		  {
-			  title    = 'Väl Åtgärd',
+			  title    = 'Choose Option',
 			  align    = 'top-right',
 			  elements = elements,
 		  },
@@ -145,7 +145,7 @@ end
 			  if success then
 				  --print(bone)
 				  local x,y,z = table.unpack(GetPedBoneCoords(player, bone))
-					Notification(x,y,z 'The damage occured here')
+					Notification(x,y,z)
 				
 			  else
 				  Notify('Where the damage occured could not get identified')
