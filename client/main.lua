@@ -227,7 +227,4 @@ end
 	  AddTextComponentString(text)
 	  DrawText(_x, _y)
    
-	  local factor = (string.len(text)) / 370
-   
-	  DrawRect(_x, _y + 0.0150, 0.030 + factor, 0.025, 41, 11, 41, 100)
   end
